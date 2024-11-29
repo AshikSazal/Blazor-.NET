@@ -1,0 +1,120 @@
+﻿@page "/servers"
+
+@* Instead of I can use this interactive in App.razor file for intire project *@
+@rendermode InteractiveServer
+
+@inject NavigationManager NavigationManager
+
+<h3>Servers</h3>
+<br />
+<br />
+<div class="container-fluid text-center">
+    <div class="row">
+        @foreach (var city in cities)
+        {
+            <div class="col">
+                <div class="card @(selectedCity.Equals(city, StringComparison.OrdinalIgnoreCase) ? "border-primary":"")">
+                    <img src="@($"/images/{city}.png")" class="card-imp-top" alt="..." />
+                    <div class="card-body">
+                        <button type="button" class="btn btn-primary" @onclick="@(()=>SelectCity(city))">@city</button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<br />
+@* With Enhance *@
+@* <ServerComponent></ServerComponent> *@
+
+@* Without Enhance *@
+@* <ServerComponent @rendermode="InteractiveServer"></ServerComponent> *@
+@* <ServerComponent></ServerComponent> *@
+
+<br />
+<div class="input-group mb-3">
+    @* <input type="text" class="form-control" placeholder="Search Servers" @onchange="HandleServerFilterChange" /> *@
+    @* <input type="text" class="form-control" placeholder="Search Servers" @bind-value="serverFilter" /> *@
+    <input type="text" class="form-control" placeholder="Search Servers" @bind-value="serverFilter" @bind-value:event="oninput" />
+    <button class="btn btn-outline-secondary" type="button" id="button-search" @onclick="HandleSearch">Search</button>
+</div>
+<ul>
+    @* @foreach(var server in servers){
+        // used @key to improve the performance
+        <li @key="server.ServerId">
+            @server.Name in @server.City is 
+            <span style="color: @((server.IsOnline ? "green" : "red"))">@((server.IsOnline ? "Online" : "Offline"))</span>
+            &nbsp;
+            <a href="/servers/@server.ServerId" class="btn btn-link">Edit</a>
+            &nbsp;
+            <EditForm Model="server" FormName="@($"form-server-{server.ServerId}")" OnValidSubmit="@(() => { DeleteServer(server.ServerId);})">
+                <button type="submit" class="btn btn-primary">Delete</button>
+            </EditForm>
+        </li>
+    } *@
+
+    @* The Virtualize component is designed to render only the visible portion. It's work's like similar to lazy loading. *@
+    @* But there is a condition component height should be same. *@
+    <Virtualize Items="this.servers" Context="server">
+        @* used @key to improve the performance*@
+        <li @key="server.ServerId">
+            @server.Name in @server.City is
+            <span style="color: @((server.IsOnline ? "green" : "red"))">@((server.IsOnline ? "Online" : "Offline"))</span>
+            &nbsp;
+            <a href="/servers/@server.ServerId" class="btn btn-link">Edit</a>
+            &nbsp;
+            <EditForm Model="server" FormName="@($"form-server-{server.ServerId}")" OnValidSubmit="@(() => { DeleteServer(server.ServerId);})">
+                <button type="submit" class="btn btn-primary">Delete</button>
+            </EditForm>
+        </li>
+    </Virtualize>
+</ul>
+
+<p>
+    <a href="/servers/add" class="btn btn-primary">Add Server</a>
+</p>
+
+@code {
+    private List<Server> servers = ServersRepository.GetServersByCity("Toronto");
+
+    private List<string> cities = CitiesRepository.GetCities();
+
+    private string selectedCity = "Toronto";
+
+    // for @bind-value="serverFilter" and @onchange="HandleServerFilterChange"
+    // private string serverFilter = "";
+
+    // @bind-value:event="oninput"
+    private string _serverFilter = "";
+    private string serverFilter {
+        get => _serverFilter;
+        set{
+            _serverFilter = value;
+            this.servers = ServersRepository.SearchServers(serverFilter);
+        }
+    }
+
+
+    private void DeleteServer(int serverId){
+        if(serverId>0){
+            ServersRepository.DeleteServer(serverId);
+            NavigationManager.NavigateTo("/servers");
+        }
+    }
+
+    private void SelectCity(string cityName){
+        this.selectedCity = cityName;
+        this.servers = ServersRepository.GetServersByCity(this.selectedCity);
+    }
+
+    // for @onchange ="HandleServerFilterChange"
+    // private void HandleServerFilterChange(ChangeEventArgs args){
+    //     serverFilter = args.Value?.ToString() ?? string.Empty;
+    // }
+
+    private void HandleSearch(){
+        this.servers = ServersRepository.SearchServers(serverFilter);
+
+        this.selectedCity = string.Empty;
+    }
+}
