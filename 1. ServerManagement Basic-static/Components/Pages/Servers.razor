@@ -98,7 +98,8 @@
     private void DeleteServer(int serverId){
         if(serverId>0){
             ServersRepository.DeleteServer(serverId);
-            NavigationManager.NavigateTo("/servers");
+            // true is for refresh the page
+            NavigationManager.NavigateTo("/servers",true);
         }
     }
 
