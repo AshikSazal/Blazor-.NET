@@ -1,0 +1,47 @@
+﻿@page "/servers"
+
+@* Instead of I can use this interactive in App.razor file for intire project *@
+@rendermode InteractiveServer
+
+@inject NavigationManager NavigationManager
+
+<h3>Servers</h3>
+<br />
+<br />
+<CityListComponent @ref="@cityListComponent" SelectCityCallback="HandleCitySelection"></CityListComponent>
+<br />
+<SearchBarComponent @ref="searchBarComponent" SearchServerCallback="HandleSearchServer"></SearchBarComponent>
+<br />
+
+<ServerListComponent @rendermode="InteractiveServer" CityName="@this.selectedCity" SearchFilter="@searchFilter"></ServerListComponent>
+
+<p>
+    <a href="/servers/add" class="btn btn-primary">Add Server</a>
+</p>
+
+@code {
+    private string selectedCity = "Toronto";
+    private string searchFilter = "";
+    private CityListComponent? cityListComponent;
+    private SearchBarComponent? searchBarComponent;
+
+    private void HandleSearch(){
+        // this.servers = ServersRepository.SearchServers(serverFilter);
+
+        // this.selectedCity = string.Empty;
+    }
+
+    private void HandleCitySelection(string cityName)
+    {
+        this.selectedCity = cityName;
+        this.searchFilter = string.Empty;
+        searchBarComponent?.ClearFilter();
+    }
+
+    private void HandleSearchServer(string searchFilter)
+    {
+        this.searchFilter = searchFilter;
+
+        cityListComponent?.ClearSelction();
+    }
+}

@@ -1,0 +1,35 @@
+﻿@inject NavigationManager NavigationManager
+
+@if(this.servers != null && this.servers.Count > 0)
+{
+    <ul>
+        @* The Virtualize component is designed to render only the visible portion. It's work's like similar to lazy loading. *@
+        @* But there is a condition component height should be same. *@
+        <Virtualize Items="this.servers" Context="server">
+            @* server comes from Virtualize Context="server" *@
+            <ServerComponent Server="server"></ServerComponent>
+        </Virtualize>
+    </ul>
+}
+
+@code {
+
+    [Parameter]
+    public string? CityName { get; set; }
+
+    [Parameter]
+    public string SearchFilter { get; set; } = "";
+
+    private List<Server>? servers;
+
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrWhiteSpace(this.SearchFilter)){
+            servers = ServersRepository.GetServersByCity(CityName ?? "Toronto");
+        } else {
+            servers = ServersRepository.SearchServers(this.SearchFilter);
+        }
+}
+
+    
+}
