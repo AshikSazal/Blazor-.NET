@@ -1,0 +1,97 @@
+﻿@inherits BaseComponent
+
+<table class="table table-striped">
+    <RepeaterComponent Items="servers">
+        <Header>
+            <thead>
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        City
+                    </th>
+                    <th>
+                        Status
+                    </th>
+                    <th>
+                        People Online
+                    </th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+        </Header>
+        <Row Context="server">
+            <ServerComponent Server="server"></ServerComponent>
+        </Row>
+    </RepeaterComponent>
+</table>
+
+@code {
+
+    [Parameter]
+    public string? CityName { get; set; }
+
+    [Parameter]
+    public string SearchFilter { get; set; } = "";
+
+    private List<Server>? servers;
+
+    private System.Threading.Timer? Timer;
+
+    public override Task SetParametersAsync(ParameterView parameters)
+    {
+        if(parameters.TryGetValue<string>("CityName", out var cityName))
+        {
+            // cityName stored new value and CityName stored old Value
+            if(cityName != CityName)
+            {
+                // if CityName changed then OnParamtersSet() function will call 
+                base.SetParametersAsync(parameters);
+            }
+        }
+        if (parameters.TryGetValue<string>("SearchFilter", out var searchFilter))
+        {
+            // searchFilter stored new value and SearchFilter stored old Value
+            if (searchFilter != SearchFilter)
+            {
+                // if SearchFilter value changed then OnParamtersSet() function will call
+                base.SetParametersAsync(parameters);
+            }
+        }
+        return Task.CompletedTask;
+    }
+    @* There is a problem in OnParamtersSet() function because this file will render then OnParametersSet() function will call even CityName doesn't changed yet.
+    So the solution is used SEtParamtersAsync() function which has written in above. *@
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrWhiteSpace(this.SearchFilter)){
+            servers = ServersRepository.GetServersByCity(CityName ?? "Toronto");
+        } else {
+            servers = ServersRepository.SearchServers(this.SearchFilter);
+        }
+    }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            // Init here
+            if(string.IsNullOrWhiteSpace(this.SearchFilter))
+            {
+                servers = ServersRepository.GetServersByCity(CityName ?? "Toronto");
+            }
+            else
+            {
+                servers = ServersRepository.SearchServers(this.SearchFilter);
+            }
+            StateHasChanged();
+            // this is for if changed in the UI then it will automatically show the changed value after every 2 seconds
+            Timer = new System.Threading.Timer(_ =>{
+                base.InvokeAsync(StateHasChanged);
+            },null, 2000, 2000);
+        }
+    }
+
+}
