@@ -62,9 +62,7 @@ Dispose()
     ↓
 Destruction (Component removed)
 
-Apologies for the misunderstanding! Here's the entire explanation of the Blazor component lifecycle after user interaction in a proper `README.md` format:
-
-```markdown
+```
 # Blazor Component Lifecycle After User Interaction
 
 In Blazor, when a user interacts with a component (e.g., clicking a button or changing input), several lifecycle methods are triggered to handle the re-rendering, parameter changes, and updates. Below is an explanation of the lifecycle methods that occur after user interaction:
@@ -80,7 +78,7 @@ In Blazor, when a user interacts with a component (e.g., clicking a button or ch
 - **When to Use**:
   You can override `ShouldRender` to optimize performance by skipping re-renders if the UI has not changed or if certain state conditions haven’t changed.
 
-  ```csharp
+  ```
   protected override bool ShouldRender()
   {
       // Only re-render if certain condition is met
@@ -99,7 +97,7 @@ In Blazor, when a user interacts with a component (e.g., clicking a button or ch
 - **When to Use**:  
   Override `SetParametersAsync` if you need to modify or validate the incoming parameters before they are applied to the component.
 
-  ```csharp
+  ```
   public override Task SetParametersAsync(ParameterView parameters)
   {
       // Modify or validate parameters before they are applied
@@ -118,7 +116,7 @@ In Blazor, when a user interacts with a component (e.g., clicking a button or ch
 - **When to Use**:  
   Override `OnParametersSetAsync` when you need to perform logic or actions after the parameters have been set or changed, such as asynchronous operations like loading data or modifying the component’s state.
 
-  ```csharp
+  ```
   protected override async Task OnParametersSetAsync()
   {
       // Perform actions after parameters are set, like fetching data
@@ -137,7 +135,7 @@ In Blazor, when a user interacts with a component (e.g., clicking a button or ch
 - **When to Use**:  
   Override `OnAfterRenderAsync` if you need to perform tasks like JavaScript interop, DOM manipulation, or trigger actions that depend on the component’s rendering.
 
-  ```csharp
+  ```
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
       if (firstRender)
@@ -182,7 +180,6 @@ Imagine you have a simple counter component that updates when a user clicks a bu
 - **`OnAfterRenderAsync`** is invoked after rendering and lets you interact with the rendered DOM or perform additional tasks that rely on the UI.
 
 By understanding these lifecycle methods, you can effectively manage user interactions and optimize your Blazor components for better performance and interactivity.
-```
 
 ### Explanation:
 - The content is formatted with headers (`##`) to separate each lifecycle method.
